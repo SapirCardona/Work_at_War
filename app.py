@@ -129,13 +129,6 @@ with tabs[0]:
 
     st.plotly_chart(fig, use_container_width=True)
 
-    fig.update_layout(
-        font=dict(family="Arial", size=16),
-        yaxis=dict(autorange="reversed"),
-        margin=dict(l=100, r=40, t=60, b=40),
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
 
 with tabs[1]:
     st.markdown("<h2 style='text-align: center;'>?מה נתנה החברה שלי לעובדים</h2>", unsafe_allow_html=True)
