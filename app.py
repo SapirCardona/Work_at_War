@@ -121,8 +121,17 @@ with tabs[0]:
     )
 
     fig.update_layout(
+        title_x=0.5,  # מרכז את הכותרת
         font=dict(family="Arial", size=16),
-        yaxis=dict(autorange="reversed"),  # מציג את ההטבות מהנפוצה לפחות נפוצה
+        yaxis=dict(autorange="reversed"),
+        margin=dict(l=100, r=40, t=60, b=40),
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    fig.update_layout(
+        font=dict(family="Arial", size=16),
+        yaxis=dict(autorange="reversed"),
         margin=dict(l=100, r=40, t=60, b=40),
     )
 
