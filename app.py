@@ -168,8 +168,7 @@ with tabs[1]:
             st.metric("כמות הטבות מדווחת", len(benefits_2))
 
     if company_1 and company_2 and company_1 != company_2:
-        st.markdown("### השוואה בין ההטבות של שתי החברות", unsafe_allow_html=True)
-
+        st.markdown("<h2 style='text-align: center;'>השוואת הטבות בין חברות</h2>", unsafe_allow_html=True)
         all_benefits = sorted(set(benefits_1) | set(benefits_2))
         table_data = {
             "הטבה": all_benefits,
@@ -188,15 +187,17 @@ with tabs[1]:
                 border-collapse: collapse;
                 direction: rtl;
                 font-size: 18px;
+                color: #eee;
               }}
               .comparison-table th, .comparison-table td {{
-                border: 1px solid #ddd;
+                border: 1px solid #444;
                 padding: 10px;
                 text-align: center;
               }}
               .comparison-table th {{
-                background-color: #f2f2f2;
+                background-color: #d0f0f9;  /* תכלת */
                 font-size: 20px;
+                color: #000; /* טקסט כהה על רקע בהיר */
               }}
             </style>
             {styled_html}
