@@ -113,16 +113,19 @@ with tabs[0]:
 
     fig = px.bar(
         benefit_df,
-        x="סוגי הטבות",
-        y="%",
-        labels={"%": "אחוז מהארגונים"},
-        title="שכיחות ההטבות"
+        x="%",
+        y="סוגי הטבות",
+        orientation="h",  # הופך את הגרף לאופקי
+        labels={"%": "אחוז מהארגונים", "סוגי הטבות": ""},
+        title="שכיחות ההטבות",
     )
+
     fig.update_layout(
-        xaxis_tickangle=-45,
-        xaxis_tickfont=dict(size=14),
         font=dict(family="Arial", size=16),
+        yaxis=dict(autorange="reversed"),  # מציג את ההטבות מהנפוצה לפחות נפוצה
+        margin=dict(l=100, r=40, t=60, b=40),
     )
+
     st.plotly_chart(fig, use_container_width=True)
 
 with tabs[1]:
