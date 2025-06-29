@@ -200,9 +200,9 @@ with tabs[1]:
                 text-align: center;
               }}
               .comparison-table th {{
-                background-color: #d0f0f9;  /* תכלת */
+                background-color: #d0f0f9;
                 font-size: 20px;
-                color: #000; /* טקסט כהה על רקע בהיר */
+                color: #000; /* 
               }}
             </style>
             {styled_html}
@@ -221,23 +221,38 @@ with tabs[2]:
 
     st.markdown("""
     <style>
-    .st-expander summary {
-        border-radius: 8px;
-        text-align: center;
+    .benefit-text {
         font-size: 18px;
-        padding: 10px;
+        font-weight: bold;
+        margin-bottom: 6px;
+        direction: rtl;
+        text-align: right;
     }
-    .st-expander summary::marker {
-        font-size: 0;
+    .green-text {
+        color: #007700;
     }
-    div[data-testid="stExpander"] > details > summary {
-        justify-content: center;
+    .red-text {
+        color: #cc0000;
     }
-    div[data-testid="stExpander"]:has(summary:contains("הכי הרבה")) summary {
-        background-color: #d8f3dc !important;  /* ירוק */
+    .benefits-box ol {
+        font-size: 16px;
+        line-height: 1.6;
+        padding-right: 24px;
+        margin: 0;
     }
-    div[data-testid="stExpander"]:has(summary:contains("הכי מעט")) summary {
-        background-color: #ffe5e5 !important;  /* אדום */
+    .benefits-box li {
+        color: #007700;
+    }
+    @media (prefers-color-scheme: dark) {
+        .green-text {
+            color: #90ee90;
+        }
+        .red-text {
+            color: #ffaaaa;
+        }
+        .benefits-box li {
+            color: #90ee90;
+        }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -249,8 +264,45 @@ with tabs[2]:
         for _, row in top_companies.iterrows():
             company_name = row["Company"]
             num_benefits = row["Max Number of Benefits"]
-            expander_title = f"{company_name} – {num_benefits} הטבות"
-            with st.expander(expander_title):
+
+            st.markdown(
+                f"<div class='benefit-text green-text'>{company_name} – {num_benefits} הטבות</div>",
+                unsafe_allow_html=True
+            )
+
+            benefits = df[df["Company"] == company_name]["Benefits"].dropna()
+            unique_benefits = set()
+            for item in benefits:
+                for b in item.split(","):
+                    b = b.strip()
+                    if b and b not in ["כלום", "פיטורים"]:
+                        unique_benefits.add(b)
+
+            if unique_benefits:
+                benefit_list = sorted(unique_benefits)
+                styled_list = "".join(f"<li>{b}</li>" for b in benefit_list)
+
+                with st.expander("לצפייה ברשימת ההטבות"):
+                    st.markdown(f"""
+                        <div class='benefits-box'>
+                            <ol>{styled_list}</ol>
+                        </div>
+                    """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("<h3 style='text-align: center;'>🔻 הכי מעט הטבות</h3>", unsafe_allow_html=True)
+        for _, row in bottom_companies.iterrows():
+            company_name = row["Company"]
+            num_benefits = row["Max Number of Benefits"]
+
+            st.markdown(
+                f"<div class='benefit-text red-text'>{company_name} – {num_benefits} הטבות</div>",
+                unsafe_allow_html=True
+            )
+
+            if num_benefits == 0:
+                st.markdown("<div class='red-text' style='direction: rtl; text-align: right;'>לא דווחו הטבות כלל.</div>", unsafe_allow_html=True)
+            else:
                 benefits = df[df["Company"] == company_name]["Benefits"].dropna()
                 unique_benefits = set()
                 for item in benefits:
@@ -258,80 +310,61 @@ with tabs[2]:
                         b = b.strip()
                         if b and b not in ["כלום", "פיטורים"]:
                             unique_benefits.add(b)
-                benefit_list = sorted(unique_benefits)
-                styled_list = "".join(f"<li>{b}</li>" for b in benefit_list)
 
-                st.markdown(f"""
-                    <div style='
-                        background-color: #e6f4ea;
-                        padding: 20px;
-                        border: 1px solid #b6d7c7;
-                        border-radius: 12px;
-                        box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
-                        direction: rtl;
-                        text-align: right;
-                    '>
-                        <ol style='font-size: 18px; line-height: 1.8;'>
-                            {styled_list}
-                        </ol>
-                    </div>
-                """, unsafe_allow_html=True)
-
-    with col2:
-        st.markdown("<h3 style='text-align: center;'>🔻 הכי מעט הטבות</h3>", unsafe_allow_html=True)
-        for _, row in bottom_companies.iterrows():
-            company_name = row["Company"]
-            num_benefits = row["Max Number of Benefits"]
-            expander_title = f"{company_name} – {num_benefits} הטבות"
-            with st.expander(expander_title):
-                if num_benefits == 0:
-                    st.markdown(f"""
-                        <div style='
-                            background-color: #fff0f0;
-                            border: 1px solid #f5b3b3;
-                            border-radius: 12px;
-                            padding: 20px;
-                            font-size: 17px;
-                            text-align: center;
-                            direction: rtl;
-                        '>
-                            לא דווחו הטבות כלל.
-                        </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    benefits = df[df["Company"] == company_name]["Benefits"].dropna()
-                    unique_benefits = set()
-                    for item in benefits:
-                        for b in item.split(","):
-                            b = b.strip()
-                            if b and b not in ["כלום", "פיטורים"]:
-                                unique_benefits.add(b)
+                if unique_benefits:
                     benefit_list = sorted(unique_benefits)
                     styled_list = "".join(f"<li>{b}</li>" for b in benefit_list)
 
-                    st.markdown(f"""
-                        <div style='
-                            background-color: #fff0f0;
-                            padding: 20px;
-                            border: 1px solid #f5b3b3;
-                            border-radius: 12px;
-                            box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
-                            direction: rtl;
-                            text-align: right;
-                        '>
-                            <ol style='font-size: 18px; line-height: 1.8;'>
-                                {styled_list}
-                            </ol>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    with st.expander("לצפייה ברשימת ההטבות"):
+                        st.markdown(f"""
+                            <div class='benefits-box'>
+                                <ol>{styled_list}</ol>
+                            </div>
+                        """, unsafe_allow_html=True)
+
 with tabs[3]:
     st.markdown("<h2 style='text-align: center;'>?מה מספרים העובדים</h2>", unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
 
+    st.markdown("""
+    <style>
+    .feedback-box {
+        padding: 12px 0;
+        direction: rtl;
+        text-align: right;
+    }
+    .feedback-text {
+        font-size: 16px;
+        line-height: 1.7;
+        margin: 0 0 6px 0;
+    }
+    .feedback-source {
+        font-weight: bold;
+        font-size: 15px;
+        text-align: left;
+        margin: 0;
+    }
+    .green-text {
+        color: #007700;
+    }
+    .red-text {
+        color: #cc0000;
+    }
+    @media (prefers-color-scheme: dark) {
+        .green-text {
+            color: #90ee90;
+        }
+        .red-text {
+            color: #ff9999;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     col_pos, col_neg = st.columns(2)
 
     with col_pos:
-        st.markdown("<h4 style='text-align: center; color: green;'>💚 פידבקים חיוביים</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center;' class='green-text'>💚 פידבקים חיוביים</h4>", unsafe_allow_html=True)
         positive_quotes = [
             ("Gotfriends", "הייתה הבנה שיש קושי בתפוקה ונירמלו את זה, מה שעזר לי באופן אישי לא לחשוש מה יקרה אם התפוקה תרד ובכל- בחלק מהימים התפוקה אפילו הייתה מעל הממוצע"),
             ("Apple", "אחרי שיחה קצרה על הקשיים אושר מענק כספי מכובד"),
@@ -340,23 +373,14 @@ with tabs[3]:
         ]
         for company, quote in positive_quotes:
             st.markdown(f"""
-            <div style='
-                background-color: #e6f4ea;
-                border: 1px solid #b6d7c7;
-                border-radius: 12px;
-                padding: 15px;
-                margin-bottom: 15px;
-                font-size: 16px;
-                line-height: 1.6;
-                box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
-            '>
-                <p>{quote}</p>
-                <p style='font-weight: bold; text-align: left;'>— {company}</p>
+            <div class='feedback-box green-text'>
+                <p class='feedback-text'>{quote}</p>
+                <p class='feedback-source'>— {company}</p>
             </div>
             """, unsafe_allow_html=True)
 
     with col_neg:
-        st.markdown("<h4 style='text-align: center; color: crimson;'>🔻 פידבקים שליליים</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center;' class='red-text'>🔻 פידבקים שליליים</h4>", unsafe_allow_html=True)
         negative_quotes = [
             ("The Phoenix", "כל עוד הנחיות פיקוד העורף מאפשרות הגעה פיזית הם נצמדים לזה. תחושה לא נעימה כי גם כשאפשר להגיע אנשים לא רוצים תמיד לבוא כי הם מפחדים"),
             ("Metropoline", "הייתי מצפה למתן מענה אנושי יותר לצרכים ולא רק עבודה מהבית"),
@@ -364,17 +388,8 @@ with tabs[3]:
         ]
         for company, quote in negative_quotes:
             st.markdown(f"""
-            <div style='
-                background-color: #fff0f0;
-                border: 1px solid #f5b3b3;
-                border-radius: 12px;
-                padding: 15px;
-                margin-bottom: 15px;
-                font-size: 16px;
-                line-height: 1.6;
-                box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
-            '>
-                <p>{quote}</p>
-                <p style='font-weight: bold; text-align: left;'>— {company}</p>
+            <div class='feedback-box red-text'>
+                <p class='feedback-text'>{quote}</p>
+                <p class='feedback-source'>— {company}</p>
             </div>
             """, unsafe_allow_html=True)
